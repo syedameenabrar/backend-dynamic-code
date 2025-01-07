@@ -11,7 +11,7 @@ const routes = (app) => {
   app.use("/dealer", dealerRouter);
   app.use("/admin", adminRouter);
   app.use("/staff", staffRouter);
-  app.use("/factoty", factoryRouter);
+  app.use("/factory", factoryRouter);
 };
 
 module.exports = routes;
