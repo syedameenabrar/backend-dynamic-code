@@ -21,7 +21,7 @@ routes(app)
 // health
 app.get("/health", catchError(async (req, res) => {
     const healthPayload = {
-        projectName: 'Zulukk Project',
+        projectName: 'Dynamic Backend Project',
         frontEnd: 'Angular',
         backEnd: 'NodeJs',
         dataBase: 'MongoDB',
