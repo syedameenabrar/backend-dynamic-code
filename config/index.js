@@ -7,4 +7,7 @@ module.exports = {
     REFRESH_TOKEN_VALIDITY: process.env.REFRESH_TOKEN_VALIDITY,
     SMS_API_KEY: process.env.SMS_API_KEY,
     FAST2SMS: process.env.FAST2SMS,
+    CLOUD_NAME: process.env.CLOUD_NAME,
+    IMAGE_API_KEY: process.env.IMAGE_API_KEY,
+    IMAGE_API_SECRET: process.env.IMAGE_API_SECRET
 }

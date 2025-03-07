@@ -2,7 +2,7 @@ const factoryService = require("../services/factory.service");
 // const { logger, AppError, responser, upload } = require("database-connection-function-com")
 const logger = require("../utils/logs");
 const responser = require("../utils/responser");
-const upload = require("../core/image");
+const upload = require("../core/cloudImage");
 const AppError = require("../utils/appError")
 
 module.exports.createFactory = async (req, res) => {
