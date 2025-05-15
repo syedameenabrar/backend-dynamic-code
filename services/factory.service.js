@@ -87,3 +87,39 @@ module.exports.getAllFactoriesWithPaginations = async (type, query) => {
         .exec(model);
     return record.data;
 }
+
+
+
+
+
+// module.exports.getAllFactoriesWithPaginationsLatestQuotations = async (type, query) => {
+//   const model = getModel(type);
+
+//   const updatedDocs = await model.find({
+//     quotationUpdateDate: { $exists: true, $ne: null }
+//   }).sort({ quotationUpdateDate: -1 }); // -1 = DESC
+
+
+//   let result = await new apiFeatures(query)
+//                 .filter()
+//         .orRegexMultipleSearch("searchFilter")
+//         .sort()
+//         .paginate()
+//         .populate(populateQuery)
+//         .exec(updatedDocs);
+//   return result;
+// };
+
+
+
+
+module.exports.getAllFactoriesWithPaginationsLatestQuotations = async (type, query) => {
+  const model = getModel(type);
+
+  const updatedDocs = await model.find({
+    quotationUpdateDate: { $exists: true, $ne: null }
+  }).sort({ quotationUpdateDate: -1 }); // -1 = DESC
+
+  return updatedDocs;
+};
+

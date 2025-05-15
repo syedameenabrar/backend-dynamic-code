@@ -619,3 +619,12 @@ module.exports.getAllFactoriesWithPaginations = async (req, res) => {
     logger.data("data", data);
     return responser.send(200, `Get All Paginations ${type} Record...`, req, res, data)
 }
+
+module.exports.getAllFactoriesWithPaginationsLatestQuotations = async (req, res) => {
+    logger.info(`Get All Factory Controllers`);
+    const query = req.query
+    const type = req.query.collectionName
+    const data = await factoryService.getAllFactoriesWithPaginationsLatestQuotations(type, query)
+    logger.data("data", data);
+    return responser.send(200, `Get All Paginations ${type} Record...`, req, res, data)
+}

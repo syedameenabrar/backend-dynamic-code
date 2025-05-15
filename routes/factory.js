@@ -28,4 +28,7 @@ factoryRouter.route("/delete/:id")
 factoryRouter.route("/pagination")
     .get(catchError(factoryController.getAllFactoriesWithPaginations))
 
+factoryRouter.route("/dealerLatestQuotations")
+    .get(catchError(factoryController.getAllFactoriesWithPaginationsLatestQuotations))
+
 module.exports = factoryRouter
