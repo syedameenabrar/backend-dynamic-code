@@ -5,7 +5,12 @@ const { catchError } = require("../utils/catchError")
 const jwtVerify = require("../auth/verify")
 
 factoryRouter.route("/create")
+    // .post(jwtVerify.verifyJWT, catchError(factoryController.createFactory))
     .post(jwtVerify.verifyJWT, catchError(factoryController.createFactory))
+
+factoryRouter.route("/createPublic")
+    // .post(jwtVerify.verifyJWT, catchError(factoryController.createFactory))
+    .post(catchError(factoryController.createFactory))
 
 factoryRouter.route("/getAll")
     .post(jwtVerify.verifyJWT, catchError(factoryController.getAllFactories))
