@@ -7,8 +7,18 @@ const apiFeatures = require("../utils/apiFeature")
 
 // Unified getModel function with proper schema registration and error handling
 const getModel = (type) => {
-    if (mongoose.models[type]) {
-        return mongoose.models[type];
+   let model = mongoose.models[type];
+
+    if (model) {
+        // Ensure paginate plugin is applied
+        if (!model.schema.plugins.some(p => p.fn === paginate)) {
+            model.schema.plugin(paginate);
+        }
+        // Ensure aggregatePaginate plugin is applied
+        if (!model.schema.plugins.some(p => p.fn === aggregatePaginate)) {
+            model.schema.plugin(aggregatePaginate);
+        }
+        return model;
     }
 
     // Define schema options
