@@ -64,12 +64,12 @@ const generatePdfFromHtml = async (vehicleData) => {
  * @param {string} filename
  * @returns {string} Uploaded PDF URL
  */
-async function uploadPdfToCloudinary(buffer, filename) {
+async function uploadPdfToCloudinary(buffer, filenameWithoutExtension) {
   return new Promise((resolve, reject) => {
     const stream = cloudinary.uploader.upload_stream(
       {
-        resource_type: 'raw',
-        public_id: `vehicle_reports/${filename}`,
+        resource_type: 'auto', // ✅ Allow automatic PDF handling
+        public_id: `vehicle_reports/${filenameWithoutExtension}`, // ❌ no .pdf here
         overwrite: true,
       },
       (error, result) => {
@@ -77,13 +77,14 @@ async function uploadPdfToCloudinary(buffer, filename) {
           console.error('Error uploading PDF to Cloudinary:', error);
           reject(error);
         } else {
-          resolve(result.secure_url);
+          resolve(result.secure_url); // ✅ Cloudinary adds .pdf itself
         }
       }
     );
     stream.end(buffer);
   });
 }
+
 
 module.exports = {
   generatePdfFromHtml,

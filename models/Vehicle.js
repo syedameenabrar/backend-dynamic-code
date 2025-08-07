@@ -1,4 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+const paginate = require("mongoose-paginate-v2");
+const aggregatePaginate = require("mongoose-aggregate-paginate-v2");
+
 
 const vehicleSchema = new mongoose.Schema({
   vehicleType: String,
@@ -49,6 +52,13 @@ const vehicleSchema = new mongoose.Schema({
   userDocumentNumber: String,
   userAddress: String,
   userAddressGoogleMapLink: String,
-});
+},
+    {
+        timestamps: true,
+    }
+);
+
+vehicleSchema.plugin(paginate);
+vehicleSchema.plugin(aggregatePaginate);
 
 module.exports = mongoose.model('products', vehicleSchema);
