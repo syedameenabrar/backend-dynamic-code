@@ -52,6 +52,7 @@ const vehicleSchema = new mongoose.Schema({
   userDocumentNumber: String,
   userAddress: String,
   userAddressGoogleMapLink: String,
+  pincode: String,
 },
     {
         timestamps: true,
