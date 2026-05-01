@@ -4,6 +4,16 @@ const factoryRouter = Router();
 const { catchError } = require("../utils/catchError")
 const jwtVerify = require("../auth/verify")
 
+  const verifyInternal = (req, res, next) => {
+  const auth = req.headers.authorization;
+
+  if (auth !== `Bearer ${process.env.WHATSAPP_SECRET}`) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  next();
+};
+
 factoryRouter.route("/create")
     // .post(jwtVerify.verifyJWT, catchError(factoryController.createFactory))
     .post(jwtVerify.verifyJWT, catchError(factoryController.createFactory))
@@ -35,5 +45,17 @@ factoryRouter.route("/pagination")
 
 factoryRouter.route("/dealerLatestQuotations")
     .get(catchError(factoryController.getAllFactoriesWithPaginationsLatestQuotations))
+
+
+// 🔐 INTERNAL (only WhatsApp service)
+factoryRouter.route("/whatsapp/internal/create-upload-link")
+  .post(verifyInternal, catchError(factoryController.createUploadLink));
+
+// 🌐 PUBLIC (token-based)
+factoryRouter.route("/whatsapp/public/get-lead-details")
+  .get(catchError(factoryController.getLeadDetailsViaToken));
+
+factoryRouter.route("/whatsapp/public/upload-images")
+  .patch(catchError(factoryController.uploadViaToken));
 
 module.exports = factoryRouter

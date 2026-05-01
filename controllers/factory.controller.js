@@ -4,6 +4,7 @@ const logger = require("../utils/logs");
 const responser = require("../utils/responser");
 const upload = require("../core/cloudImage");
 const AppError = require("../utils/appError")
+const jwt = require("jsonwebtoken");
 
 module.exports.createFactory = async (req, res) => {
     logger.info("Creating Factory Controllers");
@@ -627,4 +628,146 @@ module.exports.getAllFactoriesWithPaginationsLatestQuotations = async (req, res)
     const data = await factoryService.getAllFactoriesWithPaginationsLatestQuotations(type, query)
     logger.data("data", data);
     return responser.send(200, `Get All Paginations ${type} Record...`, req, res, data)
+}
+
+
+module.exports.createUploadLink = async (req, res) => {
+  const { leadId } = req.body;
+
+  if (!leadId) {
+    return res.status(400).send("leadId is required");
+  }
+
+  const token = jwt.sign(
+    {
+      leadId,
+      scope: "UPLOAD_IMAGES"
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: "1h" }
+  );
+
+  const uploadUrl = `${process.env.BASE_URL}/updated-lead?token=${token}`;
+
+  return res.send({
+    success: true,
+    uploadUrl
+  });
+};
+
+module.exports.getLeadDetailsViaToken = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send("Token missing");
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).send("Invalid or expired token");
+  }
+
+  const leadId = decoded.leadId;
+
+  const data = await factoryService.getOneFactory(
+    // "products",
+    "testingWhatsAppApi",
+    { uniqueProductName: leadId }
+  );
+
+  if (!data) {
+    return res.status(404).send("Lead not found");
+  }
+
+  return res.send({
+    success: true,
+    data: data
+  });
+};
+
+
+module.exports.uploadViaToken = async (req, res) => {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).send("Token missing");
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.JWT_SECRET);
+  } catch (err) {
+    return res.status(401).send("Invalid or expired token");
+  }
+
+  if (decoded.scope !== "UPLOAD_IMAGES") {
+    return res.status(403).send("Invalid scope");
+  }
+
+  const leadId = decoded.leadId;
+  const reqData = req.body;
+
+  // 🔥 PROCESS IMAGES
+
+if (Array.isArray(reqData.vehiclePictures)) {
+  const hasBase64 = reqData.vehiclePictures.some(obj => 
+    obj.img && obj.img.startsWith("data:")
+  );
+
+  if (hasBase64) {
+    const uploadedImages = await upload.uploadArrayImage(
+      reqData.vehiclePictures,
+      "vehiclePictures"
+    );
+
+    reqData.vehiclePictures = uploadedImages
+      .map(img => img?.cloudinaryResponse?.secure_url
+        ? { img: img.cloudinaryResponse.secure_url }
+        : null
+      )
+      .filter(Boolean);
+  }
+}
+
+  // 🔥 UPDATE DB
+  const data = await factoryService.updateFactory(
+    "testingWhatsAppApi",
+    { uniqueProductName: leadId },
+    { $set: reqData }   // VERY IMPORTANT
+  );
+
+  return res.send({
+    success: true,
+    message: "Images uploaded successfully",
+    data
+  });
+};
+
+
+async function processImages(images, folder) {
+  if (!Array.isArray(images) || images.length === 0) return [];
+
+  let result = [];
+
+  for (let obj of images) {
+    if (obj.img.startsWith("http")) {
+      result.push({ img: obj.img });
+    } else {
+      const uploaded = await upload.uploadArrayImage(images, folder);
+
+      result = uploaded
+        .map(img => img?.cloudinaryResponse?.secure_url ? { img: img.cloudinaryResponse.secure_url } : null)
+        .filter(Boolean);
+
+      break;
+    }
+  }
+
+  return result;
 }
