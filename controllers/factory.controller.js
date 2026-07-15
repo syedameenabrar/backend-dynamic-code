@@ -647,7 +647,7 @@ module.exports.createUploadLink = async (req, res) => {
     { expiresIn: "1h" }
   );
 
-  const uploadUrl = `${process.env.BASE_URL}/updated-lead?details=${token}`;
+  const uploadUrl = `${process.env.BASE_URL}/update-lead?details=${token}`;
 
   return res.send({
     success: true,
